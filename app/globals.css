@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -47,4 +48,43 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #6b7280; /* lighter gray */
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+  0% {
+    opacity: 0.4;
+    transform: scale(1.1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0.4;
+    transform: scale(1.1);
+  }
+}
+
+/* Define animation classes that can be used in your components */
+.animate-custom-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.pulse-container {
+  position: relative;
+}
+
+.pulse-outer {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  transform: scale(1.2);
+}
+
+.pulse-inner {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  transform: scale(1.1);
 }

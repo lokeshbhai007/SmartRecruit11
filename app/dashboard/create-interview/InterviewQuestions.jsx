@@ -37,7 +37,7 @@ export default function InterviewQuestions({ interview }) {
         },
         body: JSON.stringify(interview),
       });
-      
+        
       clearInterval(progressInterval);
       setProgress(100);
       
