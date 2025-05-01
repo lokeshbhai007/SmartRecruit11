@@ -8,7 +8,7 @@ const InterviewParticipant = ({
   name, 
   initial 
 }) => {
-  const activeLabel = isAI ? "Speaking..." : "Your turn ";
+  const activeLabel = isAI ? "Speaking..." : "Your turn...";
   const activeColor = isAI ? "blue" : "green";
 
   return (

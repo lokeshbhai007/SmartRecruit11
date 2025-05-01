@@ -16,7 +16,7 @@ export default function InterviewStartPage() {
   const router = useRouter();
   const { id, code } = params;
   const vapiRef = useRef(null);
-  
+
   // Timer reference for duration-based auto-ending
   const timerRef = useRef(null);
   const interviewStartTimeRef = useRef(null);
@@ -157,25 +157,25 @@ export default function InterviewStartPage() {
   // Timer function to automatically end interview after duration
   const startInterviewTimer = (durationMinutes) => {
     if (!durationMinutes) return;
-    
+
     // Convert minutes to milliseconds
     const durationMs = parseInt(durationMinutes) * 60 * 1000;
     interviewStartTimeRef.current = Date.now();
     const endTime = interviewStartTimeRef.current + durationMs;
-    
+
     // Clear any existing timer
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-    
+
     // Set initial remaining time
     setRemainingTime(formatRemainingTime(durationMs));
-    
+
     // Create interval to update remaining time and check for end condition
     timerRef.current = setInterval(() => {
       const now = Date.now();
       const remaining = endTime - now;
-      
+
       if (remaining <= 0) {
         // Time's up - end the interview
         clearInterval(timerRef.current);
@@ -188,13 +188,15 @@ export default function InterviewStartPage() {
       }
     }, 1000);
   };
-  
+
   // Format remaining time as MM:SS
   const formatRemainingTime = (ms) => {
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    return `${minutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   const initializeVapi = () => {
@@ -285,7 +287,7 @@ export default function InterviewStartPage() {
   // Check if AI's message contains ending phrases
   const checkForEndPhrases = (message) => {
     if (!message || interviewStatus !== "active") return;
-    
+
     // List of phrases that indicate the interview is ending
     const endPhrases = [
       "thank you for your interview",
@@ -296,15 +298,15 @@ export default function InterviewStartPage() {
       "we've reached the end of our interview",
       "we've completed all the questions",
       "thanks for your time today",
-      "i've asked all the questions"
+      "i've asked all the questions",
     ];
-    
+
     // Check if message contains any ending phrases
     const messageLower = message.toLowerCase();
-    const containsEndPhrase = endPhrases.some(phrase => 
+    const containsEndPhrase = endPhrases.some((phrase) =>
       messageLower.includes(phrase)
     );
-    
+
     if (containsEndPhrase) {
       console.log("End phrase detected in AI response:", message);
       // Give a short delay to allow the AI to finish speaking before ending
@@ -317,22 +319,22 @@ export default function InterviewStartPage() {
   // Automatically end the interview
   const autoEndInterview = (reason) => {
     console.log(`Auto-ending interview: ${reason}`);
-    
+
     // Only proceed if interview is still active
     if (interviewStatus !== "active" || !vapiRef.current) return;
-    
+
     // Stop the Vapi call
     stopInterview();
-    
+
     // Clean up timer if it exists
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
-    
+
     // Show notification to user
     toast.success(`Interview completed: ${reason}`);
-    
+
     // Short delay to let Vapi wrap up processing
     setTimeout(() => {
       router.push(`/interview/${id}/${code}/completed`);
@@ -352,10 +354,10 @@ export default function InterviewStartPage() {
 
     const candidateName = candidateData?.name || "Candidate";
     const jobPosition = interviewData?.jobPosition || "the position";
-    
+
     // If there's a duration, add it to the system prompt
-    const durationInstruction = interviewData?.duration 
-      ? `The interview should last approximately ${interviewData.duration} minutes. At the end, clearly say "Thank you for your interview" to signal completion.` 
+    const durationInstruction = interviewData?.duration
+      ? `The interview should last approximately ${interviewData.duration} minutes. At the end, clearly say "Thank you for your interview" to signal completion.`
       : "";
 
     const assistantOptions = {
@@ -369,7 +371,7 @@ export default function InterviewStartPage() {
       voice: {
         provider: "playht",
         voiceId: "jennifer",
-        speed: 0.9, // Slower speech (e.g., 0.75 to 0.95 range for natural results)
+        speed: 0.85, // Slower speech (e.g., 0.75 to 0.95 range for natural results)
       },
 
       model: {
@@ -454,6 +456,7 @@ Key Guidelines:
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          id: id, // Pass the interview ID as a regular property
           conversation: conversation,
           candidateName: candidateName,
           candidateEmail: candidateEmail,
@@ -482,28 +485,28 @@ Key Guidelines:
   const toggleMic = () => {
     // Update the UI state
     setIsMicEnabled(!isMicEnabled);
-  
+
     // Mute/unmute the Vapi call if active
     if (vapiRef.current && interviewStatus === "active") {
       try {
         if (isMicEnabled) {
           // Try to mute audio input - check for any available method in the Vapi SDK
-          if (typeof vapiRef.current.stopRecording === 'function') {
+          if (typeof vapiRef.current.stopRecording === "function") {
             vapiRef.current.stopRecording();
-          } else if (typeof vapiRef.current.stopAudioInput === 'function') {
+          } else if (typeof vapiRef.current.stopAudioInput === "function") {
             vapiRef.current.stopAudioInput();
-          } else if (typeof vapiRef.current.setMuted === 'function') {
+          } else if (typeof vapiRef.current.setMuted === "function") {
             vapiRef.current.setMuted(true);
           }
           // Update UI state regardless
           setListening(false);
         } else {
           // Try to unmute audio input - check for any available method in the Vapi SDK
-          if (typeof vapiRef.current.startRecording === 'function') {
+          if (typeof vapiRef.current.startRecording === "function") {
             vapiRef.current.startRecording();
-          } else if (typeof vapiRef.current.startAudioInput === 'function') {
+          } else if (typeof vapiRef.current.startAudioInput === "function") {
             vapiRef.current.startAudioInput();
-          } else if (typeof vapiRef.current.setMuted === 'function') {
+          } else if (typeof vapiRef.current.setMuted === "function") {
             vapiRef.current.setMuted(false);
           }
           // Update UI state regardless
@@ -513,9 +516,11 @@ Key Guidelines:
         console.error("Error toggling microphone:", error);
         // Still update the UI even if the API call fails
         setListening(!isMicEnabled);
-        
+
         // Optionally show a toast notification about the mic issue
-        toast.error("Could not change microphone state. Please refresh the page.");
+        toast.error(
+          "Could not change microphone state. Please refresh the page."
+        );
       }
     }
   };
@@ -575,7 +580,7 @@ Key Guidelines:
               "Welcome! The interview has started. Feel free to speak naturally
               — the AI interviewer is here to assist you throughout."
             </p>
-            
+
             {/* Time remaining display - only show when interview is active */}
             {interviewStatus === "active" && interviewData?.duration && (
               <div className="text-center mt-1">
@@ -586,7 +591,7 @@ Key Guidelines:
             )}
           </div>
         </div>
-  
+
         <div className="p-6">
           {/* Interview Participants UI Component - using our custom component */}
           <div className="flex justify-between items-center mb-6 mx-auto max-w-2xl">
@@ -598,10 +603,10 @@ Key Guidelines:
               name="AI Interviewer"
               initial="A"
             />
-  
+
             {/* Divider Line */}
             <div className="h-0.5 w-24 bg-gradient-to-r from-transparent via-gray-600 to-transparent"></div>
-  
+
             {/* Candidate */}
             <InterviewParticipant
               isActive={activeUser}
@@ -611,20 +616,20 @@ Key Guidelines:
               initial={candidateInitial}
             />
           </div>
-  
+
           {/* Conversation Container */}
           <div className="bg-gray-900/80 rounded-lg p-4 mb-5 shadow-inner">
             {/* Interview Status Card */}
-            <InterviewStatusCard 
-              listening={listening} 
-              jobPosition={interviewData?.jobPosition} 
-              candidateName={candidateData?.name} 
+            <InterviewStatusCard
+              listening={listening}
+              jobPosition={interviewData?.jobPosition}
+              candidateName={candidateData?.name}
             />
-  
+
             {/* Interview Status Indicator */}
             <InterviewStatusIndicator status={interviewStatus} />
           </div>
-  
+
           {/* Control buttons */}
           <ControlButtons
             isMicEnabled={isMicEnabled}
@@ -633,14 +638,14 @@ Key Guidelines:
           />
         </div>
       </div>
-  
+
       {/* Status message for interview state */}
       {error && (
         <div className="fixed bottom-4 left-4 right-4 max-w-md mx-auto bg-red-500 text-white p-2 rounded-lg text-sm shadow-lg">
           {error}
         </div>
       )}
-  
+
       {/* Confirmation Modal for ending interview */}
       {showConfirmationModal && (
         <ConfirmationModal
@@ -652,7 +657,7 @@ Key Guidelines:
           onCancel={cancelEndInterview}
         />
       )}
-      
+
       {/* Reload Warning Modal */}
       {showReloadWarning && (
         <ConfirmationModal
@@ -663,7 +668,7 @@ Key Guidelines:
           showCancel={false}
         />
       )}
-  
+
       {/* Add the separated animation styles component */}
       <InterviewAnimationStyles />
     </div>

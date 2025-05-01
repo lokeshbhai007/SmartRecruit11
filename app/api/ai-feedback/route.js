@@ -47,7 +47,7 @@ Based on this interview conversation between the AI interviewer and the candidat
     "experience": <1-10>
   },
   "totalScore": <0-100>,
-  "summary": "<3-line summary>",
+  "summary": "<5-line summary>",
   "recommendation": "Recommended" | "Not Recommended",
   "recommendationMsg": "<one-line message>"
 }
@@ -123,7 +123,7 @@ function generateDefaultFeedback(conversation) {
 export async function POST(req) {
   try {
     // Extract conversation data and candidate information from request
-    const { conversation, candidateName, candidateEmail, jobPosition } = await req.json();
+    const { id, conversation, candidateName, candidateEmail, jobPosition } = await req.json();
     
     if (!conversation || !Array.isArray(conversation) || conversation.length === 0) {
       throw new Error("Invalid or empty conversation data");
@@ -206,7 +206,8 @@ export async function POST(req) {
       const db = client.db(process.env.MONGODB_DB || 'feedback_getter');
       
       await db.collection("feedback_interview").insertOne({
-        // Add candidate information to the database entry
+        // Use the id from the request object, not a variable in this scope
+        id: id, // Changed from id:id to interviewId: id
         candidateName: candidateName || "Unknown Candidate",
         candidateEmail: candidateEmail || "Not Provided",
         jobPosition: jobPosition || "Not Specified",

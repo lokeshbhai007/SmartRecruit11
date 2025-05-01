@@ -1,10 +1,9 @@
-// app/interview/[id]/[code]/page.jsx
-
 "use client";
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Button from "@/app/components/ui/Button";
 import ProgressBar from "@/app/components/ui/ProgressBar";
+import { toast } from "react-hot-toast"; // Make sure you have this package installed
 
 export default function InterviewStart() {
   const params = useParams();
@@ -87,11 +86,22 @@ export default function InterviewStart() {
 
       const data = await response.json();
 
-      // Check for already taken interview BEFORE throwing an error
+      // Check for already taken interview
       if (data.alreadyTaken) {
+        toast.error(
+          "You have already taken this interview. Each candidate can only attempt once."
+        );
         setFormError(
           "You have already taken this interview. Each candidate can only attempt once."
         );
+        setSubmitting(false);
+        return;
+      }
+
+      // Check if the link has expired (already used by someone else)
+      if (data.linkExpired) {
+        toast.error("This interview link has expired and can no longer be used.");
+        setFormError("This interview link has expired and can no longer be used.");
         setSubmitting(false);
         return;
       }
@@ -103,10 +113,12 @@ export default function InterviewStart() {
 
       // If we get here, everything is good - proceed to the interview
       console.log(`Attempting to navigate to: /interview/${id}/${code}/start`);
+      toast.success("Interview started successfully!");
       router.push(`/interview/${id}/${code}/start`);
       
     } catch (err) {
       console.error("Error saving candidate data:", err);
+      toast.error(err.message || "Failed to start interview. Please try again.");
       setFormError(
         err.message || "Failed to start interview. Please try again."
       );
@@ -133,15 +145,18 @@ export default function InterviewStart() {
           </div>
         ) : interview ? (
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
+            <h1 className="text-5xl py-4 font-bold text-center">
+              <span className="text-white">Smart</span>
+              <span className="text-blue-500">Recruit</span>
+            </h1>
             <div className="text-center mb-4">
-              <h1 className="text-2xl font-bold text-white mb-4">
+              <h1 className="text-2xl font-bold text-green-400 mb-4">
                 Welcome to Your {interview.jobPosition} Interview
               </h1>
-              <div className="inline-block bg-blue-600/20 border border-blue-500 rounded-lg px-6 py-3 mb-6">
+              <div className="inline-block bg-blue-600/20 border border-blue-500 rounded-lg px-6 py-3 mb-4">
                 <p className="text-blue-200">
-                  {interview.questions.length} questions • {interview.duration}{" "}
-                  min • {interview.level} level
-                </p>
+                  {interview.questions.length} Questions • {interview.duration}{" "}
+                  Min Interview </p>
               </div>
             </div>
 
@@ -193,6 +208,7 @@ export default function InterviewStart() {
                 <li>You'll be asked {interview.questions.length} questions</li>
                 <li>Speak clearly and take your time to answer</li>
                 <li>Candidate can only take this interview once</li>
+                <li>This interview link can only be used once</li>
               </ul>
             </div>
 

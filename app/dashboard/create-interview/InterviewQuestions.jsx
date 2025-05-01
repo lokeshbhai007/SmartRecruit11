@@ -1,13 +1,10 @@
-// app/dashboard/create-interview/InterviewQuestions.jsx
-
-// Update the InterviewQuestions component to save to MongoDB:
-
 "use client";
 import { useState } from 'react';
 import QuestionCard from '@/app/components/QuestionCard';
 import Button from '@/app/components/ui/Button';
 import Link from 'next/link';
 import ProgressBar from '@/app/components/ui/ProgressBar';
+import toast, { Toaster } from 'react-hot-toast'; // Import Toaster component
 
 export default function InterviewQuestions({ interview }) {
   const [saving, setSaving] = useState(false);
@@ -61,18 +58,22 @@ export default function InterviewQuestions({ interview }) {
     }
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(candidateUrl)
-      .then(() => {
-        alert('Candidate URL copied to clipboard!');
-      })
-      .catch(err => {
-        console.error('Failed to copy URL: ', err);
-      });
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(candidateUrl);
+      toast.success('Candidate URL copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy URL: ', err);
+      toast.error('Failed to copy URL.');
+    }
   };
+  
 
   return (
     <div className="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 mt-8">
+      {/* Add the Toaster component here */}
+      <Toaster position="top-right" />
+      
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-white">Generated Questions</h2>
         <div className="flex items-center">

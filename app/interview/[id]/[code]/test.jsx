@@ -164,3 +164,34 @@ export async function POST(req) {
     // such as sending it to an gemini api AI model or storing it in a database 
     // of MONGODB_URI as name of collection feedback_interview and also first colsole.log it 
 }
+
+
+
+
+
+
+
+
+
+
+
+function LatestInterviewsList() {
+  const [interviewList, setInterviewList] = useState([]);
+  const { user } = useUser();
+
+  const GetInterviewList = async () => {
+    let { data: Interviews, error } = await supabase
+      .from('Interviews')
+      .select('*')
+      .eq('userEmail', user?.email);
+  };
+}
+
+
+
+
+
+
+
+
+

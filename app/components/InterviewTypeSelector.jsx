@@ -1,4 +1,3 @@
-// app/components/InterviewTypeSelector.jsx - Updated for multi-select
 import { useState } from 'react';
 
 export default function InterviewTypeSelector({ value, onChange, disabled = false }) {
@@ -13,11 +12,13 @@ export default function InterviewTypeSelector({ value, onChange, disabled = fals
   // Convert string value to array if needed
   const selectedValues = Array.isArray(value) ? value : value ? [value] : [];
   
-  const handleCheckboxChange = (type) => {
+  const toggleSelection = (type) => {
+    if (disabled) return;
+    
     const newSelection = selectedValues.includes(type)
       ? selectedValues.filter(t => t !== type)
       : [...selectedValues, type];
-    
+      
     // Create a synthetic event to match the onChange interface
     onChange({
       target: {
@@ -32,25 +33,31 @@ export default function InterviewTypeSelector({ value, onChange, disabled = fals
       <label className="block text-gray-300 mb-2 font-medium">
         Interview Type (Select Multiple)
       </label>
-      <div className="bg-gray-700 rounded-md p-3 border border-gray-600">
-        {types.map((type) => (
-          <div key={type.value} className="flex items-center mb-2 last:mb-0">
-            <input
-              type="checkbox"
-              id={`type-${type.value}`}
-              checked={selectedValues.includes(type.value)}
-              onChange={() => handleCheckboxChange(type.value)}
+      <div className="flex flex-wrap gap-2">
+        {types.map((type) => {
+          const isSelected = selectedValues.includes(type.value);
+          return (
+            <button
+              key={type.value}
+              type="button"
+              onClick={() => toggleSelection(type.value)}
               disabled={disabled}
-              className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 bg-gray-700"
-            />
-            <label htmlFor={`type-${type.value}`} className="text-gray-200">
+              className={`px-4 py-2 rounded-md transition-colors duration-200 
+                ${isSelected 
+                  ? 'bg-green-700 text-white' 
+                  : 'bg-gray-700 text-gray-300 border border-gray-600'} 
+                ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-600'}`}
+            >
               {type.label}
-            </label>
-          </div>
-        ))}
+              {isSelected && (
+                <span className="ml-2">✓</span>
+              )}
+            </button>
+          );
+        })}
       </div>
       {selectedValues.length === 0 && (
-        <p className="text-red-400 text-sm mt-1">Please select at least one interview type</p>
+        <p className="text-red-400 text-sm mt-2">Please select at least one interview type</p>
       )}
     </div>
   );

@@ -1,6 +1,5 @@
-// app/dashboard/layout.jsx
+// app/layout.jsx
 
-// "use client";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 // import { InterviewProvider } from './lib/context/InterviewContext';
@@ -25,9 +24,10 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <div className="min-h-screen bg-gray-900 text-white">
           {/* <Header /> */}

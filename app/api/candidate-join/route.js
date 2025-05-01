@@ -1,7 +1,3 @@
-// app/api/candidate-join/route.js
-//save the join candidate data for showing You have already taken this interview
-// //join the interview first page ensure one time interview
-
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/utils/mongodb';
 
@@ -30,6 +26,19 @@ export async function POST(request) {
     if (existingEntry) {
       return NextResponse.json(
         { success: false, alreadyTaken: true, message: 'You have already taken this interview' },
+        { status: 400 }
+      );
+    }
+    
+    // Check if the interview link has already been used by anyone
+    const interviewLinkUsed = await db.collection('join_candidate_data').findOne({
+      interviewId,
+      candidateCode
+    });
+    
+    if (interviewLinkUsed) {
+      return NextResponse.json(
+        { success: false, linkExpired: true, message: 'This interview link has expired' },
         { status: 400 }
       );
     }
